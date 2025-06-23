@@ -7,7 +7,8 @@ export async function POST(req) {
     await r3.connect();
 
     const scene = await r3.loadScene(project, project);
-    scene.takeOffline()
+    await scene.playTimeline('Out');
+    // scene.takeOffline()
 
     return new Response(JSON.stringify({ status: 'ok' }), { status: 200 });
 }
