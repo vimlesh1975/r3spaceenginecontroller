@@ -51,7 +51,8 @@ export default function Page() {
       alignItems: 'center',
       gap: '12px',
       flexWrap: 'wrap',
-      marginBottom: '16px'
+      marginBottom: '16px',
+
     },
     label: {
       fontWeight: 'bold',
@@ -234,18 +235,31 @@ export default function Page() {
         <>
           <h3>Scene Exports</h3>
           {exports.map((exp) => (
-            <div key={exp.name} style={styles.row}>
+            <div key={exp.name} style={styles.row} >
               <label style={styles.label}>{exp.name}:</label>
-              <input
-                style={styles.input}
-                value={exportValues[exp.name] || ""}
-                onChange={(e) =>
-                  setExportValues((prev) => ({ ...prev, [exp.name]: e.target.value }))
-                }
-              />
+
+              {exp.type === "String" ? (
+                <textarea
+                  style={{ ...styles.input, height: 60, width: 700, resize: 'vertical' }}
+                  value={exportValues[exp.name] || ""}
+                  onChange={(e) =>
+                    setExportValues((prev) => ({ ...prev, [exp.name]: e.target.value }))
+                  }
+                />
+              ) : (
+                <input
+                  style={styles.input}
+                  value={exportValues[exp.name] || ""}
+                  onChange={(e) =>
+                    setExportValues((prev) => ({ ...prev, [exp.name]: e.target.value }))
+                  }
+                />
+              )}
+
               <small style={{ color: darkMode ? '#bbb' : '#666' }}>({exp.type})</small>
             </div>
           ))}
+
 
 
         </>

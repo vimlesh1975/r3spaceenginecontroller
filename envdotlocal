@@ -1,0 +1,5 @@
+R3_HOST=localhost
+
+
+# R3_PORT=9009 #   this is for program 
+R3_PORT=9010 #   this is for preview
