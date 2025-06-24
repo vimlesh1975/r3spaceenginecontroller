@@ -4,7 +4,7 @@ export async function POST(req) {
     const { project, scene, timeline } = await req.json()
     console.log(project, scene, timeline)
 
-    const r3 = new R3SpaceEngine('localhost', 9009)
+    const r3 = new R3SpaceEngine('localhost', 9010)
     await r3.connect()
 
     const sceneObj = await r3.loadScene(project, scene);
