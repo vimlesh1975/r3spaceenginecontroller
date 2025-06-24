@@ -1,12 +1,9 @@
-import { R3SpaceEngine } from 'wtv-r3-space-engine'
-
+import { getR3Client } from '../../lib/r3client.js'
 export async function POST(req) {
     const { project, scene, timeline, exportedvalues } = await req.json()
     console.log(project, scene, timeline)
 
-    const r3 = new R3SpaceEngine('localhost', 9010)
-    r3.setDebug(true)
-    await r3.connect()
+    const r3 = await getR3Client();
 
     const sceneObj = await r3.loadScene(project, scene)
 

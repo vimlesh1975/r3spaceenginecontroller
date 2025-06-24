@@ -167,7 +167,7 @@ export default function Page() {
               }).then(res => res.json()).then(console.log)
             }
           >
-            ▶️ In
+            ▶️ Play with defalut values
           </button>
 
           <button
@@ -198,7 +198,7 @@ export default function Page() {
               }).then(res => res.json()).then(console.log)
             }
           >
-            ▶️ With Exports
+            ▶️ Play With new values
           </button>
           <button style={{ ...styles.button, ...styles.btnExport }} onClick={() => {
             fetch("/api/unloadAllScenes", {
@@ -206,7 +206,25 @@ export default function Page() {
               headers: { "Content-Type": "application/json" },
             }).then(res => res.json()).then(console.log)
           }}>Unload All Scenes</button>
-
+          <button
+            style={{ ...styles.button, ...styles.btnSend }}
+            onClick={async () => {
+              const updates = Object.entries(exportValues).map(([name, value]) => ({ name, value }))
+              const res = await fetch("/api/setExports", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  project: selectedProject,
+                  scene: selectedScene,
+                  updates
+                })
+              })
+              const result = await res.json()
+              console.log("Export update:", result)
+            }}
+          >
+            Update values
+          </button>
 
         </div>
       )}
@@ -229,25 +247,7 @@ export default function Page() {
             </div>
           ))}
 
-          <button
-            style={{ ...styles.button, ...styles.btnSend }}
-            onClick={async () => {
-              const updates = Object.entries(exportValues).map(([name, value]) => ({ name, value }))
-              const res = await fetch("/api/setExports", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  project: selectedProject,
-                  scene: selectedScene,
-                  updates
-                })
-              })
-              const result = await res.json()
-              console.log("Export update:", result)
-            }}
-          >
-            Send Exports
-          </button>
+
         </>
       )}
     </div>
