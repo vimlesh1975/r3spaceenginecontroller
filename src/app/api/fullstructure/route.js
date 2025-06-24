@@ -4,7 +4,6 @@ import { R3SpaceEngine } from 'wtv-r3-space-engine'
 export async function GET() {
   const r3 = new R3SpaceEngine('localhost', 9010)
   await r3.connect();
-  console.log(r3.getR3InstallationPath())
 
   const projects = await r3.getProjects()
   const projectData = []

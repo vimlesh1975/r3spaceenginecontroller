@@ -5,7 +5,7 @@ export async function POST(req) {
 
     const r3 = new R3SpaceEngine('localhost', 9010)
     await r3.connect()
-    const sceneObj = await r3.loadScene(project, scene);
+    const sceneObj = await r3.getScene(project, scene, true);
 
     if (!sceneObj) {
         return new Response(JSON.stringify({ error: "Scene not found" }), { status: 404 })

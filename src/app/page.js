@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 
 export default function Page() {
   const [isClient, setIsClient] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
+  const [darkMode, setDarkMode] = useState(true)
   const [data, setData] = useState([])
   const [selectedProject, setSelectedProject] = useState(null)
   const [selectedScene, setSelectedScene] = useState(null)
@@ -15,7 +15,11 @@ export default function Page() {
     setIsClient(true)
     fetch("/api/fullstructure")
       .then((res) => res.json())
-      .then((data) => setData(data.projectData))
+      .then((data) => {
+        setData(data.projectData);
+        setSelectedProject(data.projectData[0]?.name || null);
+      }
+      )
       .catch((err) => console.error("Failed to fetch structure", err))
   }, [])
 
