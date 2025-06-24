@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 
+const projectPath = "C:/Users/Administrator/Documents/R3.Space.Projects/projects";
+
 export default function Page() {
   const [isClient, setIsClient] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
@@ -10,6 +12,10 @@ export default function Page() {
   const [selectedScene, setSelectedScene] = useState(null)
   const [exports, setExports] = useState([])
   const [exportValues, setExportValues] = useState({})
+  const [thumbnail, setThumbnail] = useState(null)
+
+
+
 
   useEffect(() => {
     setIsClient(true)
@@ -88,6 +94,9 @@ export default function Page() {
       </div>
 
       <h2>🎮 R³ Scene Controller</h2>
+      <div>
+        <img src={thumbnail} alt='thumb' />
+      </div>
 
       {/* Project & Scene Select */}
       <div style={styles.row}>
@@ -99,6 +108,7 @@ export default function Page() {
             setSelectedScene(null)
             setExports([])
             setExportValues({})
+            setThumbnail(null)
           }}
           style={styles.select}
         >
@@ -125,6 +135,7 @@ export default function Page() {
 
                 const data = await res.json()
                 setExports(data.exports || [])
+                setThumbnail(data.thumbnail || null)
 
                 const initialValues = {}
                 data.exports.forEach((exp) => {
@@ -195,6 +206,8 @@ export default function Page() {
               headers: { "Content-Type": "application/json" },
             }).then(res => res.json()).then(console.log)
           }}>Unload All Scenes</button>
+
+
         </div>
       )}
 
