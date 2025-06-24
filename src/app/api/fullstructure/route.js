@@ -9,29 +9,35 @@ export async function GET() {
   const projectData = [];
 
   for (const project of projects) {
-    const scenes = await r3.getScenes(project);
+    const scenes = await r3.getScenes(project); // scenes may be full IDs like "Bug/BugLowerThird1"
     const sceneData = [];
 
-    for (const sceneName of scenes) {
+    for (const sceneFullName of scenes) {
       try {
-        const scene = await r3.loadScene(project, sceneName);
-        const exportList = await scene.getExports(); // returns { status, response }
+        const scene = await r3.loadScene(project, sceneFullName);
+
+        const exportList = await scene.getExports();
         const exportNames = exportList.response.map((item) => ({
           name: item.Name,
           type: item.Type,
           value: item.Value
         }));
+
+        const cleanName = sceneFullName.includes('/')
+          ? sceneFullName.split('/')[1]
+          : sceneFullName;
+
         sceneData.push({
-          name: sceneName,
+          name: cleanName,      // ✅ frontend will only get scene name
           exports: exportNames
         });
       } catch (err) {
+        console.error(`❌ Failed to load scene ${sceneFullName} in project ${project}`, err);
         sceneData.push({
-          name: sceneName,
-          error: `Could not load scene`,
+          name: sceneFullName,
+          error: true,
           exports: []
         });
-        console.error(`❌ Scene "${sceneName}" in project "${project}" failed:`, err);
       }
     }
 
@@ -40,6 +46,6 @@ export async function GET() {
       scenes: sceneData
     });
   }
-  console.log(JSON.stringify(projectData));
+
   return NextResponse.json({ projectData });
 }

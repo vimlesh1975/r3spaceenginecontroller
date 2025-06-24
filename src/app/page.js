@@ -3,16 +3,28 @@
 import React, { useEffect, useState } from "react"
 
 export default function Page() {
+  const [isClient, setIsClient] = useState(false)
   const [data, setData] = useState([])
   const [selectedProject, setSelectedProject] = useState(null)
   const [selectedScene, setSelectedScene] = useState(null)
   const [exportValues, setExportValues] = useState({})
 
   useEffect(() => {
+    setIsClient(true) // avoid hydration mismatch
     fetch("/api/fullstructure")
       .then((res) => res.json())
       .then((data) => setData(data.projectData))
       .catch((err) => console.error("Failed to fetch structure", err))
+  }, [])
+
+
+  useEffect(() => {
+    console.log("Hydration check", {
+      isClient,
+      hasData: data.length > 0,
+      selectedProject,
+      selectedScene
+    });
   }, [])
 
   const handleExportChange = (key, value) => {
@@ -29,6 +41,12 @@ export default function Page() {
       .then((data) => console.log("Updated scene:", data))
       .catch((err) => console.error("Update failed", err))
   }
+
+
+  if (!isClient) return null;
+  if (data.length === 0) return null; // or just skip rendering parts below
+
+
 
   return (
     <div style={{ padding: 20, maxWidth: 800, margin: "0 auto" }}>
@@ -69,9 +87,15 @@ export default function Page() {
             }}
           >
             <option value="" disabled>Select a scene</option>
-            {data.find(p => p.name === selectedProject)?.scenes.map((scene) => (
-              <option key={scene.name} value={scene.name}>{scene.name}</option>
-            ))}
+            {data.find(p => p.name === selectedProject)?.scenes.map((scene) => {
+              const cleanName = scene.name.includes("/") ? scene.name.split("/")[1] : scene.name;
+              return (
+                <option key={scene.name} value={scene.name}>
+                  {cleanName}
+                </option>
+              );
+            })}
+
           </select>
         </>
       )}
@@ -96,29 +120,70 @@ export default function Page() {
         </div>
       )}
 
-      {/* Expandable Tree View */}
-      <div style={{ marginTop: 40 }}>
-        <h2>Tree View</h2>
-        {data.map((project) => (
-          <div key={project.name} style={{ marginBottom: 10 }}>
-            <strong>{project.name}</strong>
-            <ul style={{ marginLeft: 20 }}>
-              {project.scenes.map((scene) => (
-                <li key={scene.name}>
-                  {scene.name}
-                  <ul style={{ marginLeft: 20 }}>
-                    {scene.exports.map((ex) => (
-                      <li key={ex.name}>
-                        {ex.name} <small style={{ color: '#999' }}>({ex.type})</small>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      {/* Play In / Out */}
+      <div style={{ marginTop: 10 }}>
+        <button
+          onClick={() =>
+            fetch("/api/timeline", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                project: selectedProject,
+                scene: selectedScene,
+                timeline: "In"
+              })
+            }).then((res) => res.json()).then(console.log)
+          }
+          style={{ marginRight: 10, padding: "6px 12px", background: "blue", color: "white", border: "none", borderRadius: 4 }}
+        >
+          ▶️ Play In
+        </button>
+
+        <button
+          onClick={() =>
+            fetch("/api/timeline", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                project: selectedProject,
+                scene: selectedScene,
+                timeline: "Out"
+              })
+            }).then((res) => res.json()).then(console.log)
+          }
+          style={{ padding: "6px 12px", background: "gray", color: "white", border: "none", borderRadius: 4 }}
+        >
+          ⏹ Play Out
+        </button>
       </div>
+
+
+      {/* Expandable Tree View */}
+      {isClient && data.length > 0 && (
+        <div style={{ marginTop: 40 }}>
+          <h2>Tree View</h2>
+          {data.map((project) => (
+            <div key={project.name} style={{ marginBottom: 10 }}>
+              <strong>{project.name}</strong>
+              <ul style={{ marginLeft: 20 }}>
+                {project.scenes.map((scene) => (
+                  <li key={scene.name}>
+                    {scene.name}
+                    <ul style={{ marginLeft: 20 }}>
+                      {scene.exports.map((ex) => (
+                        <li key={ex.name}>
+                          {ex.name} <small style={{ color: '#999' }}>({ex.type})</small>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+
     </div>
   )
 }
