@@ -185,6 +185,12 @@ export default function Page() {
           >
             ▶️ With Exports
           </button>
+          <button style={{ ...styles.button, ...styles.btnExport }} onClick={() => {
+            fetch("/api/unloadAllScenes", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            }).then(res => res.json()).then(console.log)
+          }}>Unload All Scenes</button>
         </div>
       )}
 
