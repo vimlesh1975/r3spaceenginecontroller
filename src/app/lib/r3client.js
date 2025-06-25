@@ -11,6 +11,7 @@ export async function getR3Client() {
         await r3.connect()
         r3.setDebug(true)
 
+
     }
     return r3
 }

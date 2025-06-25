@@ -20,6 +20,8 @@ export async function POST(req) {
         await new Promise((resolve) => setTimeout(resolve, 2000))
 
         await sceneObj.takeOffline()
+        await r3.sendCommand(`engine unloadscene "${project}/${scene}"`)
+        // sceneObj.unload();
         // await r3.disconnect()
     }
 

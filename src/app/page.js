@@ -15,7 +15,7 @@ export default function Page() {
   const [thumbnail, setThumbnail] = useState(null)
   const [command, setCommand] = useState(`engine createscene "ProjectName/SceneName"`)
   const [commandResponse, setCommandResponse] = useState(``)
-  const [listloadedscenes, setListloadedscenes] = useState(``)
+  const [listloadedscenes, setListloadedscenes] = useState([])
 
 
 
@@ -51,7 +51,9 @@ export default function Page() {
         const list = match?.[1]
           .split(',')
           .map(str => str.trim()) || []
-        setListloadedscenes(list);
+        if (list.length > 0 && list[0] !== '') {
+          setListloadedscenes(list)
+        }
       }
       )
       .catch((err) => console.error("Failed to fetch structure", err))
@@ -193,12 +195,26 @@ export default function Page() {
               fetch("/api/timeline", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ project: selectedProject, scene: selectedScene, timeline: "In" })
-              }).then(res => res.json()).then(console.log)
+                body: JSON.stringify({
+                  project: selectedProject,
+                  scene: selectedScene,
+                  timeline: "In"
+                })
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  const sceneId = `${selectedProject}/${selectedScene}`
+                  if (!listloadedscenes.includes(sceneId)) {
+                    setListloadedscenes((prev) => [...prev, sceneId])
+                  }
+                  console.log("✅ Played with default values:", data)
+                })
+                .catch((err) => console.error("❌ Failed to play", err))
             }
           >
-            ▶️ Play with defalut values
+            ▶️ Play with default values
           </button>
+
 
           <button
             style={{ ...styles.button, ...styles.btnOut }}
@@ -206,12 +222,27 @@ export default function Page() {
               fetch("/api/timeline", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ project: selectedProject, scene: selectedScene, timeline: "Out" })
-              }).then(res => res.json()).then(console.log)
+                body: JSON.stringify({
+                  project: selectedProject,
+                  scene: selectedScene,
+                  timeline: "Out"
+                })
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log("🛑 Scene taken offline:", data)
+
+                  const sceneId = `${selectedProject}/${selectedScene}`
+                  setListloadedscenes((prev) =>
+                    prev.filter((item) => item !== sceneId)
+                  )
+                })
+                .catch((err) => console.error("❌ Failed to take offline", err))
             }
           >
             ⏹ Out
           </button>
+
 
           <button
             style={{ ...styles.button, ...styles.btnExport }}
@@ -223,19 +254,45 @@ export default function Page() {
                   project: selectedProject,
                   scene: selectedScene,
                   timeline: "In",
-                  exportedvalues: Object.entries(exportValues).map(([name, value]) => ({ name, value }))
+                  exportedvalues: Object.entries(exportValues).map(([name, value]) => ({
+                    name,
+                    value
+                  }))
                 })
-              }).then(res => res.json()).then(console.log)
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  const sceneId = `${selectedProject}/${selectedScene}`
+                  // Only add if not already in list
+                  if (!listloadedscenes.includes(sceneId)) {
+                    setListloadedscenes((prev) => [...prev, sceneId])
+                  }
+                  console.log("✅ Played with new values:", data)
+                })
+                .catch((err) => console.error("❌ Failed to play with new values", err))
             }
           >
-            ▶️ Play With new values
+            ▶️ Play With New Values
           </button>
-          <button style={{ ...styles.button, ...styles.btnExport }} onClick={() => {
-            fetch("/api/unloadAllScenes", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-            }).then(res => res.json()).then(console.log)
-          }}>Unload All Scenes</button>
+
+          <button
+            style={{ ...styles.button, ...styles.btnExport }}
+            onClick={() => {
+              fetch("/api/unloadAllScenes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log("🧹 Unloaded all scenes:", data)
+                  setListloadedscenes([]) // 🧼 Clear from UI too
+                })
+                .catch((err) => console.error("❌ Failed to unload all scenes", err))
+            }}
+          >
+            🧹 Unload All Scenes
+          </button>
+
           <button
             style={{ ...styles.button, ...styles.btnSend }}
             onClick={async () => {
@@ -318,9 +375,28 @@ export default function Page() {
       )}
       <div>
 
-        {listloadedscenes.map((scene, index) => (
+        {listloadedscenes && listloadedscenes.map((scene, index) => (
           <li key={index} style={{ marginBottom: '8px' }}>
             {scene}
+            <button
+              style={{ ...styles.button, ...styles.btnOut }}
+              onClick={() =>
+                fetch("/api/timeline", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    project: scene.split('/')[0],
+                    scene: scene.split('/')[1],
+                    timeline: "Out"
+                  })
+                }).then(() => {
+                  const dd = listloadedscenes.filter((s) => s !== scene)
+                  setListloadedscenes(dd)
+                })
+              }
+            >
+              ⏹ Out
+            </button>
           </li>
         ))}
 
