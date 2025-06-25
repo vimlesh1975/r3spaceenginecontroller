@@ -6,7 +6,7 @@ export async function POST(req) {
     const r3 = await getR3Client()
 
     const aa = await r3.sendCommand(command)
-    console.log(aa)
+    // console.log(aa)
 
     return new Response(JSON.stringify({ responce: aa }))
 }

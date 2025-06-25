@@ -164,7 +164,35 @@ export default function Page() {
       </div>
 
       <div style={{ border: '1px solid red', width: 300 }}>
-        <h2>Thumbnail</h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+          <div>
+            <h2>Thumbnail</h2>
+          </div>
+          {/* <div>
+            <button onClick={async () => {
+              fetch("/api/sendCommand", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ command: `scene "${selectedProject}/${selectedScene}" getcurrentthumbnail` })
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  const raw = data.responce?.response || ""
+                  // Extract base64 using regex
+                  const match = raw.match(/<IMAGE>(.*?)<\/IMAGE>/);
+                  if (match && match[1]) {
+                    const base64 = match[1];
+                    setThumbnail(`data:image/png;base64,${base64}`)
+                  } else {
+                    console.warn("⚠️ No <IMAGE> tag found in response.");
+                  }
+                })
+                .catch((err) => console.error("Failed to fetch scenes", err))
+
+            }}>Get Thumbnail</button>
+          </div> */}
+        </div>
+
         <div style={{ border: ' 2px solid green' }}>
 
           <img src={thumbnail} alt="thumb" width={290} height={200} />
@@ -172,24 +200,42 @@ export default function Page() {
         <h2>Actions</h2>
         {selectedScene && (
           <div>
-            <button
-              onClick={() =>
-                fetch("/api/timeline", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ project: selectedProject, scene: selectedScene, timeline: "In" })
-                })
-                  .then((res) => res.json())
-                  .then(() => {
-                    const sceneId = `${selectedProject}/${selectedScene}`
-                    if (!listloadedscenes.includes(sceneId)) {
-                      setListloadedscenes((prev) => [...prev, sceneId])
-                    }
+            <div>
+              <button
+                onClick={() =>
+                  fetch("/api/timeline", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ project: selectedProject, scene: selectedScene, timeline: "In" })
                   })
-              }
-            >
-              ▶️ Play with default values
-            </button>
+                    .then((res) => res.json())
+                    .then(() => {
+                      const sceneId = `${selectedProject}/${selectedScene}`
+                      if (!listloadedscenes.includes(sceneId)) {
+                        setListloadedscenes((prev) => [...prev, sceneId])
+                      }
+                    })
+                }
+              >
+                ▶️ Play with default values
+              </button>
+            </div>
+            <div>
+              <button
+                onClick={async () => {
+                  const updates = Object.entries(exportValues).map(([name, value]) => ({ name, value }))
+                  const res = await fetch("/api/setExports", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ project: selectedProject, scene: selectedScene, updates })
+                  })
+                  const result = await res.json()
+                  console.log("Export update:", result)
+                }}
+              >
+                Update values
+              </button>
+            </div>
 
             <button
               onClick={() =>
@@ -207,80 +253,81 @@ export default function Page() {
             >
               ⏹ Out
             </button>
-
-            <button
-              onClick={() =>
-                fetch("/api/playwithexportedvalues", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    project: selectedProject,
-                    scene: selectedScene,
-                    timeline: "In",
-                    exportedvalues: Object.entries(exportValues).map(([name, value]) => ({ name, value }))
+            <div>
+              <button
+                onClick={() =>
+                  fetch("/api/playwithexportedvalues", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      project: selectedProject,
+                      scene: selectedScene,
+                      timeline: "In",
+                      exportedvalues: Object.entries(exportValues).map(([name, value]) => ({ name, value }))
+                    })
                   })
-                })
-                  .then((res) => res.json())
-                  .then(() => {
-                    const sceneId = `${selectedProject}/${selectedScene}`
-                    if (!listloadedscenes.includes(sceneId)) {
-                      setListloadedscenes((prev) => [...prev, sceneId])
-                    }
+                    .then((res) => res.json())
+                    .then(() => {
+                      const sceneId = `${selectedProject}/${selectedScene}`
+                      if (!listloadedscenes.includes(sceneId)) {
+                        setListloadedscenes((prev) => [...prev, sceneId])
+                      }
+                    })
+                }
+              >
+                ▶️ Play With New Values
+              </button>
+            </div>
+
+            <div>
+              <button
+                onClick={() => {
+                  fetch("/api/unloadAllScenes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
                   })
-              }
-            >
-              ▶️ Play With New Values
-            </button>
+                    .then((res) => res.json())
+                    .then(() => setListloadedscenes([]))
+                }}
+              >
+                🧹 Unload All Scenes
+              </button>
+            </div>
 
-            <button
-              onClick={() => {
-                fetch("/api/unloadAllScenes", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                })
-                  .then((res) => res.json())
-                  .then(() => setListloadedscenes([]))
-              }}
-            >
-              🧹 Unload All Scenes
-            </button>
 
-            <button
-              onClick={async () => {
-                const updates = Object.entries(exportValues).map(([name, value]) => ({ name, value }))
-                const res = await fetch("/api/setExports", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ project: selectedProject, scene: selectedScene, updates })
-                })
-                const result = await res.json()
-                console.log("Export update:", result)
-              }}
-            >
-              Update values
-            </button>
-            <div></div>
 
-            <input
-              type="text"
-              value={command}
-              onChange={(e) => setCommand(e.target.value)}
-              placeholder="Enter command here"
-            />
-            <button
-              onClick={async () => {
-                const res = await fetch("/api/sendCommand", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ command })
-                })
-                const result = await res.json()
-                setCommandResponse(JSON.stringify(result))
-              }}
-            >
-              Send Command
-            </button>
-            <label>{commandResponse}</label>
+            <div style={{ border: '1px solid black' }}>
+              <div>
+                <h3>Command</h3>
+                <textarea
+                  style={{ width: 280, height: 100 }}
+                  type="text"
+                  value={command}
+                  onChange={(e) => setCommand(e.target.value)}
+                  placeholder="Enter command here"
+                />
+              </div>
+              <div>
+                <button
+                  onClick={async () => {
+                    const res = await fetch("/api/sendCommand", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ command })
+                    })
+                    const result = await res.json()
+                    setCommandResponse(JSON.stringify(result))
+                  }}
+                >
+                  Send Command
+                </button>
+              </div>
+              <h3>Response</h3>
+
+              <label>{commandResponse}</label>
+            </div>
+
+
           </div>
         )}
       </div>
