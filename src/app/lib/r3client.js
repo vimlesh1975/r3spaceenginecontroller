@@ -10,6 +10,7 @@ export async function getR3Client() {
         r3 = new R3SpaceEngine(host, port)
         await r3.connect()
         r3.setDebug(true)
+
     }
     return r3
 }

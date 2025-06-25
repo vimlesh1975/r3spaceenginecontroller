@@ -14,6 +14,8 @@ export default function Page() {
   const [exportValues, setExportValues] = useState({})
   const [thumbnail, setThumbnail] = useState(null)
   const [command, setCommand] = useState(`engine createscene "ProjectName/SceneName"`)
+  const [commandResponse, setCommandResponse] = useState(``)
+  const [listloadedscenes, setListloadedscenes] = useState(``)
 
 
 
@@ -29,6 +31,32 @@ export default function Page() {
       )
       .catch((err) => console.error("Failed to fetch structure", err))
   }, [])
+
+  useEffect(() => {
+    setIsClient(true)
+    fetch("/api/sendCommand", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        command: `engine listloadedscenes`
+      })
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data.responce.response);
+        const raw = data.responce.response // the string inside
+
+        const match = raw.match(/\[(.*?)\]/)
+
+        const list = match?.[1]
+          .split(',')
+          .map(str => str.trim()) || []
+        setListloadedscenes(list);
+      }
+      )
+      .catch((err) => console.error("Failed to fetch structure", err))
+  }, [])
+
 
   if (!isClient || data.length === 0) return null
 
@@ -234,10 +262,11 @@ export default function Page() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  command: 'engine createscene "ProjectName11/SceneName11"',
+                  command
                 })
               })
               const result = await res.json()
+              setCommandResponse(JSON.stringify(result))
               console.log("Export update:", result)
             }}
           >
@@ -247,9 +276,11 @@ export default function Page() {
             type="text"
             value={command}
             onChange={(e) => setCommand(e.target.value)}
-            style={{ width: 400, marginLeft: 10 }}
+            style={{ ...styles.input, width: 400, marginLeft: 10 }}
             placeholder="Enter command here"
           />
+          <label style={{ ...styles.label }}>{commandResponse}:</label>
+          {command}
         </div>
       )}
 
@@ -285,7 +316,17 @@ export default function Page() {
 
         </>
       )}
+      <div>
 
+        {listloadedscenes.map((scene, index) => (
+          <li key={index} style={{ marginBottom: '8px' }}>
+            {scene}
+          </li>
+        ))}
+
+
+
+      </div>
 
     </div>
   )
