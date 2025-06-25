@@ -46,10 +46,13 @@ export default function Page() {
   if (!isClient || data.length === 0) return null
 
   return (<div>
-    <h2>R³ Scene Controller</h2>
+    <div style={{ backgroundColor: 'rgb(0, 123, 255)', height: 50, color: 'white' }}>
+      <h2 >R³ Scene Controller</h2>
+    </div>
+
     <div style={{ display: 'flex' }}>
 
-      <div style={{ border: '1px solid red' }}>
+      <div style={{ border: '1px solid red', width: 250, }}>
         <h2>Project:</h2>
         <select
           value={selectedProject || ""}
@@ -70,7 +73,7 @@ export default function Page() {
         {selectedProject && (
           <>
             <h2>Scene:</h2>
-            <div style={{ maxHeight: 700, maxWidth: 200, overflow: 'scroll' }}>
+            <div style={{ maxHeight: 700, overflow: 'scroll' }}>
               {data.find(p => p.name === selectedProject)?.scenes.map(scene => (
                 <div
                   key={scene.name}
@@ -111,8 +114,61 @@ export default function Page() {
           </>
         )}
       </div>
+      <div style={{ border: '1px solid red', width: 950 }}>
 
-      <div style={{ border: '1px solid red' }}>
+        <div>
+          <h3>Variables</h3>
+          {exports.length > 0 && (
+            <div style={{ height: 850, overflow: 'auto' }}>
+
+              <table border="1" cellPadding="8" cellSpacing="0">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Value</th>
+                    <th>Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {exports.map((exp) => (
+                    <tr key={exp.name}>
+                      <td>{exp.name}</td>
+                      <td>
+                        {exp.type === "String" ? (
+                          <textarea
+                            style={{ width: 720, height: 60, resize: 'vertical' }}
+                            value={exportValues[exp.name] || ""}
+                            onChange={(e) =>
+                              setExportValues((prev) => ({ ...prev, [exp.name]: e.target.value }))
+                            }
+                          />
+                        ) : (
+                          <input
+                            style={{ width: 300 }}
+                            value={exportValues[exp.name] || ""}
+                            onChange={(e) =>
+                              setExportValues((prev) => ({ ...prev, [exp.name]: e.target.value }))
+                            }
+                          />
+                        )}
+                      </td>
+                      <td>{exp.type}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+        </div>
+      </div>
+
+      <div style={{ border: '1px solid red', width: 300 }}>
+        <h2>Thumbnail</h2>
+        <div style={{ border: ' 2px solid green' }}>
+
+          <img src={thumbnail} alt="thumb" width={290} height={200} />
+        </div>
         <h2>Actions</h2>
         {selectedScene && (
           <div>
@@ -203,6 +259,7 @@ export default function Page() {
             >
               Update values
             </button>
+            <div></div>
 
             <input
               type="text"
@@ -230,42 +287,8 @@ export default function Page() {
 
 
 
-      <div style={{ border: '1px solid red' }}>
-        <div >
-          <img src={thumbnail} alt="thumb" />
-        </div>
-        <div>
-          {exports.length > 0 && (
-            <div>
-              <h3>Scene Exports</h3>
-              {exports.map((exp) => (
-                <div key={exp.name}>
-                  <label>{exp.name}:</label>
-                  {exp.type === "String" ? (
-                    <textarea
-                      value={exportValues[exp.name] || ""}
-                      onChange={(e) =>
-                        setExportValues((prev) => ({ ...prev, [exp.name]: e.target.value }))
-                      }
-                    />
-                  ) : (
-                    <input
-                      value={exportValues[exp.name] || ""}
-                      onChange={(e) =>
-                        setExportValues((prev) => ({ ...prev, [exp.name]: e.target.value }))
-                      }
-                    />
-                  )}
-                  <small>({exp.type})</small>
-                </div>
-              ))}
-            </div>
-          )}
 
-        </div>
-      </div>
-
-      <div style={{ border: '1px solid red' }}>
+      <div style={{ border: '1px solid red', width: 400 }}>
         <h2>Loaded Scenes</h2>
         <table border="1" cellPadding="8" cellSpacing="0">
           <thead>
