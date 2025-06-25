@@ -13,6 +13,7 @@ export default function Page() {
   const [exports, setExports] = useState([])
   const [exportValues, setExportValues] = useState({})
   const [thumbnail, setThumbnail] = useState(null)
+  const [command, setCommand] = useState(`engine createscene "ProjectName/SceneName"`)
 
 
 
@@ -226,7 +227,29 @@ export default function Page() {
           >
             Update values
           </button>
-
+          <button
+            style={{ ...styles.button, ...styles.btnSend }}
+            onClick={async () => {
+              const res = await fetch("/api/sendCommand", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  command: 'engine createscene "ProjectName11/SceneName11"',
+                })
+              })
+              const result = await res.json()
+              console.log("Export update:", result)
+            }}
+          >
+            Send Command
+          </button>
+          <input
+            type="text"
+            value={command}
+            onChange={(e) => setCommand(e.target.value)}
+            style={{ width: 400, marginLeft: 10 }}
+            placeholder="Enter command here"
+          />
         </div>
       )}
 
@@ -260,10 +283,10 @@ export default function Page() {
             </div>
           ))}
 
-
-
         </>
       )}
+
+
     </div>
   )
 }
