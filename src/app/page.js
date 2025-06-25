@@ -9,7 +9,7 @@ export default function Page() {
   const [selectedScene, setSelectedScene] = useState(null)
   const [exports, setExports] = useState([])
   const [exportValues, setExportValues] = useState({})
-  const [thumbnail, setThumbnail] = useState(null)
+  // const [thumbnail, setThumbnail] = useState(null)
   const [command, setCommand] = useState(`engine createscene "ProjectName/SceneName"`)
   const [commandResponse, setCommandResponse] = useState(``)
   const [listloadedscenes, setListloadedscenes] = useState([])
@@ -61,7 +61,7 @@ export default function Page() {
             setSelectedScene(null)
             setExports([])
             setExportValues({})
-            setThumbnail(null)
+            // setThumbnail(null)
           }}
         >
           <option value="" disabled>Select</option>
@@ -88,7 +88,7 @@ export default function Page() {
 
                     const data = await res.json()
                     setExports(data.exports || [])
-                    setThumbnail(data.thumbnail || null)
+                    // setThumbnail(data.thumbnail || null)
 
                     const initialValues = {}
                     data.exports.forEach((exp) => {
@@ -107,6 +107,7 @@ export default function Page() {
                   }}
                 >
                   {scene.name}
+                  <img src={scene.thumbnail}></img>
                 </div>
               ))}
             </div>
@@ -166,7 +167,7 @@ export default function Page() {
       <div style={{ border: '1px solid red', width: 300 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
           <div>
-            <h2>Thumbnail</h2>
+            {/* <h2>Thumbnail</h2> */}
           </div>
           {/* <div>
             <button onClick={async () => {
@@ -193,10 +194,10 @@ export default function Page() {
           </div> */}
         </div>
 
-        <div style={{ border: ' 2px solid green' }}>
+        {/* <div style={{ border: ' 2px solid green' }}>
 
           <img src={thumbnail} alt="thumb" width={290} height={200} />
-        </div>
+        </div> */}
         <h2>Actions</h2>
         {selectedScene && (
           <div>

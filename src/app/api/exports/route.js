@@ -19,10 +19,10 @@ export async function POST(req) {
         value: item.Value
     }))
 
-    const filePath = `C:/Users/Administrator/Documents/R3.Space.Projects/projects/${project}/${scene}/thumb.png`
-    const fileData = fs.readFileSync(filePath)
-    const thumbnail = `data:image/png;base64,${fileData.toString('base64')}`
+    // const filePath = `C:/Users/Administrator/Documents/R3.Space.Projects/projects/${project}/${scene}/thumb.png`
+    // const fileData = fs.readFileSync(filePath)
+    // const thumbnail = `data:image/png;base64,${fileData.toString('base64')}`
 
-    return new Response(JSON.stringify({ status: "OK", exports: response, thumbnail }))
+    return new Response(JSON.stringify({ status: "OK", exports: response }))
 }
 
