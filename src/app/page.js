@@ -337,7 +337,7 @@ export default function Page() {
             placeholder="Enter command here"
           />
           <label style={{ ...styles.label }}>{commandResponse}:</label>
-          {command}
+
         </div>
       )}
 
