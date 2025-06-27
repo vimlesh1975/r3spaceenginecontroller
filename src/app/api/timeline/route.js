@@ -11,7 +11,7 @@ export async function POST(req) {
     }
 
     if (timeline === "In") {
-        await sceneObj.takeOnline()
+        await sceneObj.takeOnline(0)
         await sceneObj.playTimeline("In")
     } else if (timeline === "Out") {
         await sceneObj.playTimeline("Out")

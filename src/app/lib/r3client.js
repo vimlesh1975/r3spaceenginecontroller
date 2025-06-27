@@ -12,6 +12,9 @@ export async function getR3Client() {
         r3.setDebug(true)
 
 
+        // const sceneObj = await r3.loadScene(project, scene)
+        // sceneObj.takeOnline()
+
     }
     return r3
 }
